@@ -8,13 +8,12 @@
 #include <algorithm>
 
 // defining vectors outside the scope of the functions
-std::vector<double> x_array;
-std::vector<double> y_array;
-std::vector<double> magnitude_array;
-std::vector<double> deviation_array;
-std::vector<double> gradient_array;
-std::vector<double> intercept_array;
-std::vector<double> sum_array;
+std::vector<float> x_array;
+std::vector<float> y_array;
+std::vector<float> magnitude_array;
+std::vector<float> gradient_array;
+std::vector<float> intercept_array;
+std::vector<float> sum_array;
 
 //reading function 
 
@@ -99,33 +98,56 @@ int magnitudeFct(){
 int straightLine(){
     
     //define variables
-    float gradient=3;
-    float intercept=2;
+    int gradient, intercept;
     float deviation, sum;
-    const int size=10;
+    int start=-5, stop=10;
+    auto size = -start+stop;
     int gradient_array[size], intercept_array[size];
+    int gradient_value, intercept_value;
 
     std::iota(gradient_array, gradient_array+size, 1);
     std::iota(intercept_array, intercept_array+size, 1);
 
     // calculations using the least mean square method, looping over various values for the gradient and intercept
-    for (int g=0; g<size; g++){
+    for (int g=start; g<stop; g++){
         gradient = gradient_array[g];
 
-        for (int n=0; n<size; n++){
+        for (int n=start; n<stop; n++){
             intercept = intercept_array[n];
+
+            //clearing the array for the sum
+            std::vector<float> deviation_array;
 
             for(int i=0; i<x_array.size(); i++){
                 deviation = pow( ((gradient * x_array[i] + intercept) - y_array[i]) ,2) ;
                 deviation_array.push_back(deviation);
-                std::cout << deviation << std::endl;
             }
 
+            //calculate the sum of the squares and adding it to an array
             sum = accumulate(deviation_array.begin(),deviation_array.end(),0.0f);
-            //std::cout << "The sum is " << sum << std::endl;
             sum_array.push_back(sum);
-            std::cout << "The sum value " << sum << " for gradient " << g << " and intercept " << n << " has been added to the list" << std::endl;
-        }
+            }
     }
+
+
+    //find the index of the minimum
+    auto min_element_it = std::min_element(sum_array.begin(), sum_array.end());
+    int min_element_index = std::distance(sum_array.begin(), min_element_it);
+    std::cout << "Minimum element position: " << min_element_index << " with value " << sum_array[min_element_index] << std::endl;
+    //std::cout << "The total size of the array is: " << sum_array.size() << std::endl;
+    //std::cout << "The size of the test range is: " << size << std::endl;
+
+    //define the best gradient and intercept values
+    intercept_value = (min_element_index % size) + start;
+    gradient_value = (min_element_index / size) + start;
+    
+    //final equation
+    std::string equation = std::to_string(gradient_value) + " * x + " + std::to_string(intercept_value);
+    std::cout << "The fitting function has equation " << equation << std::endl;
+    std::string fileName = "NewFile.txt";
+    std::ofstream outputFile(fileName);
+    outputFile << equation;
+    outputFile.close();
+
     return 0;
 }
