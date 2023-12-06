@@ -18,9 +18,10 @@ splitting the 2 functions => keep as backup
 int main(){
     
     // read the data
-    reading();
+    std::string fileName = "input2D_float.txt";
+    reading(fileName);
 
-    // use the terminal input to define wheteher to print or calculate the magnitude
+    // use the terminal input to define whether to print or calculate the magnitude
     std::string answer;
     std::cout << "Would you like to use the printing or calculating function? Answer with 'P' or 'C'." << std::endl;
     std::cin >> answer;
@@ -35,9 +36,16 @@ int main(){
         }
     else if (answer=="C"){magnitudeFct();}
     else {std::cout << "Please type your answer in the format P or C.";}
-
-    straightLine();
     
+    // reading the error files 
+    std::string fileName2 = "error2D_float.txt";
+    reading_error(fileName2);
+
+    // computing the best fit equation
+    straightLine();
+
+
+
     return 0;
 
 

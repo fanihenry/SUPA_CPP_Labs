@@ -14,27 +14,29 @@ std::vector<float> magnitude_array;
 std::vector<float> gradient_array;
 std::vector<float> intercept_array;
 std::vector<float> sum_array;
+std::vector<float> chi_array;
+std::vector<float> error_x;
+std::vector<float> error_y;
+std::vector<float> xy_array;
+std::vector<float> x2_array;
+int amount=1;
 
 //reading function 
 
-int reading(){
+int reading(std::string fileName){
 
     // open and read the file
-    std::string fileName = "input2D_float.txt";
     std::ifstream inputFile(fileName);
     if(inputFile.is_open()){ std::cout << "File is open" << std::endl;}
     else{std::cout << "File is not open" << std::endl;}
 
-    // loop over every line 
+    // loop over every line and store the values in a vector
     std::string line;  
     int lineNumber = 0;
     double x, y;
 
     while(std::getline(inputFile,line)){
-        //std::cout << lineNumber << std::endl;
         if (lineNumber > 0) { //skipping the first line
-
-            //std::cout << line << std::endl;
             
             // add x coordinate to the vector
             std::string x_string = line.substr(0, line.find(","));
@@ -49,21 +51,64 @@ int reading(){
         }
         lineNumber++;
     }
+
+    //closing the file
     inputFile.close();
     std::cout << "File is closed" << std::endl; //check-point
     return 0;
 }
 
+
+//reading function - FOR ERRORS
+
+int reading_error(std::string fileName2){
+
+    // open and read the file
+    std::ifstream inputFile(fileName2);
+    if(inputFile.is_open()){ std::cout << "File is open" << std::endl;}
+    else{std::cout << "File is not open" << std::endl;}
+
+    // loop over every line and store the values in a vector
+    std::string line;  
+    int lineNumber = 0;
+    double x, y;
+
+    while(std::getline(inputFile,line)){
+        if (lineNumber > 0) { //skipping the first line
+            
+            // add x coordinate to the vector
+            std::string x_string = line.substr(0, line.find(","));
+            x = std::stof(x_string);
+            error_x.push_back(x);
+
+            // add y coordinate to the vector
+            std::string y_string = line.substr(line.find(",")+1, line.find("/n"));
+            y = std::stof(y_string);
+            error_y.push_back(y);
+
+        }
+        lineNumber++;
+    }
+
+    // check-point
+    std::cout << "The errors have been added to a vector" << std::endl;
+
+    //closing the file
+    inputFile.close();
+    std::cout << "File is closed" << std::endl; //check-point
+    return 0;
+}
+
+
 //printing function 
 
-int printing(int lineNumber){
+int printing(int lineNumber) {
     double x;
     double y;
 
     if (lineNumber>x_array.size()){
         std::cout << "It exceeds the maximum number of lines, which is " << x_array.size() <<std::endl;
-        lineNumber = x_array.size();
-    }
+        lineNumber = x_array.size();}
 
     for(int i=0; i<lineNumber; i++){
 
@@ -74,11 +119,11 @@ int printing(int lineNumber){
         //calculating the magnitude and printing the outcome
         float magnitude = sqrt(pow(x,2) + pow(y,2));
         std::cout << "For the point " << i << " with coordinates (" << x << "," << y << ")"<< ", the magnitude of the vector is " << magnitude << std::endl;
-        magnitude_array.push_back(magnitude);
-    }
-    //std::cout << "Printing function is working" << std::endl; //check-point
+        magnitude_array.push_back(magnitude);}
+
     return 0;
 }
+
 
 //magnitude function
 
@@ -93,61 +138,88 @@ int magnitudeFct(){
     return 0;
 }
 
-// calculating the straight lien function
+
+// calculating the straight line function
 
 int straightLine(){
     
     //define variables
-    int gradient, intercept;
-    float deviation, sum;
-    int start=-5, stop=10;
-    auto size = -start+stop;
-    int gradient_array[size], intercept_array[size];
-    int gradient_value, intercept_value;
+    float chi, chi_square, gradient_value, intercept_value;  
+    int N = x_array.size();
 
-    std::iota(gradient_array, gradient_array+size, 1);
-    std::iota(intercept_array, intercept_array+size, 1);
+    //looping over all values
+    for(int i=0; i<x_array.size(); i++){
+        // calculating the component equal to the product of x and y
+        float xy = x_array[i] * y_array[i];
+        xy_array.push_back(xy);
+        // calculating the component equal to x square
+        float x2 = pow(x_array[i],2);
+        x2_array.push_back(x2);}
+        
+    // summing over 
+    float xy_sum = accumulate(xy_array.begin(),xy_array.end(),0.0f);
+    float x2_sum = accumulate(x2_array.begin(),x2_array.end(),0.0f);
+    float X = accumulate(x_array.begin(),x_array.end(),0.0f);
+    float Y = accumulate(y_array.begin(),y_array.end(),0.0f);
 
-    // calculations using the least mean square method, looping over various values for the gradient and intercept
-    for (int g=start; g<stop; g++){
-        gradient = gradient_array[g];
-
-        for (int n=start; n<stop; n++){
-            intercept = intercept_array[n];
-
-            //clearing the array for the sum
-            std::vector<float> deviation_array;
-
-            for(int i=0; i<x_array.size(); i++){
-                deviation = pow( ((gradient * x_array[i] + intercept) - y_array[i]) ,2) ;
-                deviation_array.push_back(deviation);
-            }
-
-            //calculate the sum of the squares and adding it to an array
-            sum = accumulate(deviation_array.begin(),deviation_array.end(),0.0f);
-            sum_array.push_back(sum);
-            }
-    }
-
-
-    //find the index of the minimum
-    auto min_element_it = std::min_element(sum_array.begin(), sum_array.end());
-    int min_element_index = std::distance(sum_array.begin(), min_element_it);
-    std::cout << "Minimum element position: " << min_element_index << " with value " << sum_array[min_element_index] << std::endl;
-    //std::cout << "The total size of the array is: " << sum_array.size() << std::endl;
-    //std::cout << "The size of the test range is: " << size << std::endl;
-
-    //define the best gradient and intercept values
-    intercept_value = (min_element_index % size) + start;
-    gradient_value = (min_element_index / size) + start;
+    //gradient and intercept values
+    gradient_value = ( N * xy_sum - X * Y ) / ( N * x2_sum - X * X );
+    intercept_value = ( x2_sum * Y - xy_sum * X ) / ( N * x2_sum - X * X );
     
-    //final equation
+    //chi square test
+    for(int i=0; i<x_array.size(); i++){
+        chi = pow( (y_array[i] - (gradient_value*x_array[i] +intercept_value) ),2) / pow(error_y[i],2);
+        chi_array.push_back(chi);}
+    chi_square = accumulate(chi_array.begin(),chi_array.end(),0.0f); 
+
+    //final equation and chi square - print and copy to new file
     std::string equation = std::to_string(gradient_value) + " * x + " + std::to_string(intercept_value);
+    std::string goodness = "The value of chi square is " + std::to_string(chi_square);
     std::cout << "The fitting function has equation " << equation << std::endl;
+    std::cout << goodness << std::endl;
     std::string fileName = "NewFile.txt";
     std::ofstream outputFile(fileName);
     outputFile << equation;
+    outputFile << goodness;
     outputFile.close();
+
+    return 0;
+}
+
+
+// recursive function to calculate x^y
+
+float power(float x, float y) {
+    int y_int = (int)y;
+    float result;
+
+    if (amount < y_int){
+        result = result*x;
+        amount++ ;
+        power(result,amount);
+
+    }
+
+    else if (amount==y_int){
+        result = result*x;
+        std::cout << "The result is " << result << std::endl;
+
+    }
+
+    else {
+        std::cout << "Error??" << std::endl;
+    }
+
+    return power(x,y+1);
+}
+
+int main() {
+    float x = 2.0;
+    float y = 3;
+
+    float result = power(x, y);
+
+    std::cout << x << " raised to the power of " << y << " is: " << result << std::endl;
 
     return 0;
 }

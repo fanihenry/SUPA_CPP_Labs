@@ -1,1 +1,1 @@
--1 * x + 1
+0.126265 * x + 2.026280The value of chi square is 791243.750000
