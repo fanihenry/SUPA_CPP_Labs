@@ -6,6 +6,7 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
+#include "CustomFunctions.h"
 
 // defining vectors outside the scope of the functions
 std::vector<float> x_array;
@@ -187,31 +188,3 @@ int straightLine(){
 }
 
 
-// recursive function to calculate x^y
-
-float power(float x, float y) {
-    int y_int = (int)y;
-    float result;
-
-    if (amount < y_int){
-        //result = result*x;
-        amount++ ;
-        //power(result,amount);
-
-    }
-
-    else if (amount==y_int){
-        //result = result*x;
-        std::cout << "The result is " << result << std::endl;
-        return 1;
-
-    }
-
-    else {
-        std::cout << "Error??" << std::endl;
-        return 1;
-    }
-
-    return power(x*x,y_int+1);
-
-}

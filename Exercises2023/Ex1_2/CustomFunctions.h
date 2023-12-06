@@ -8,4 +8,4 @@ int reading_error(std::string fileName2);
 int printing(int lineNumber);
 int magnitudeFct();
 int straightLine();
-float power(float x, float y);
+//float power(float x, float y);
