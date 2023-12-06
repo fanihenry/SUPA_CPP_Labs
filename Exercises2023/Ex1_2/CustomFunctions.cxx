@@ -194,32 +194,24 @@ float power(float x, float y) {
     float result;
 
     if (amount < y_int){
-        result = result*x;
+        //result = result*x;
         amount++ ;
-        power(result,amount);
+        //power(result,amount);
 
     }
 
     else if (amount==y_int){
-        result = result*x;
+        //result = result*x;
         std::cout << "The result is " << result << std::endl;
+        return 1;
 
     }
 
     else {
         std::cout << "Error??" << std::endl;
+        return 1;
     }
 
-    return power(x,y+1);
-}
+    return power(x*x,y_int+1);
 
-int main() {
-    float x = 2.0;
-    float y = 3;
-
-    float result = power(x, y);
-
-    std::cout << x << " raised to the power of " << y << " is: " << result << std::endl;
-
-    return 0;
 }

@@ -44,9 +44,13 @@ int main(){
     // computing the best fit equation
     straightLine();
 
+    // computing the power function x^y
+    //float x = 2.0;
+    //float y = 3;
 
+    //float result = power(x, y);
+
+    //std::cout << x << " raised to the power of " << y << " is: " << result << std::endl;
 
     return 0;
-
-
 }
