@@ -20,6 +20,7 @@ std::vector<float> error_x;
 std::vector<float> error_y;
 std::vector<float> xy_array;
 std::vector<float> x2_array;
+std::vector<float> x_power_array;
 int amount=1;
 
 //reading function 
@@ -188,3 +189,39 @@ int straightLine(){
 }
 
 
+// recursive function to calculate x^y
+
+float power(float x, float y, float r) {
+ 
+    int y_int = (int)y+1;
+    float result;
+    
+    if (amount==y_int){
+        std::cout << "The result of x=" << x << " raised to the power of y=" << y << " is " << r << std::endl;
+        return r;}
+    else if (amount<y_int){
+        amount++ ;}
+    else {
+        std::cout << "Error??" << std::endl;
+        return 1;}
+    return power(x,y,x*r);
+
+}
+
+int power_dataset(){
+
+    //looping over all values in the dataset
+    for(int i=0; i<x_array.size(); i++){
+        float x_power;
+        // calculating x^y
+        x_power = power(x_array[i],y_array[i],x_array[i]);
+        x_power_array.push_back(x_power);
+        // calculating the component equal to x square
+        float x2 = pow(x_array[i],2);
+        x2_array.push_back(x2);}
+        
+    // summing over 
+    float xy_sum = accumulate(xy_array.begin(),xy_array.end(),0.0f);
+
+    return 0;
+}

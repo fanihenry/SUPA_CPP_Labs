@@ -45,12 +45,13 @@ int main(){
     straightLine();
 
     // computing the power function x^y
-    //float x = 2.0;
-    //float y = 3;
+    float x = 2.2;
+    float y = 0.0;
+    float result = power(x, y, x);
 
-    //float result = power(x, y);
-
-    //std::cout << x << " raised to the power of " << y << " is: " << result << std::endl;
+    // computing x^y for all the datapoints
+    power_dataset();
+    std::cout << "The values of x^y have been calculated for all the datapoints." << std::endl;
 
     return 0;
 }
