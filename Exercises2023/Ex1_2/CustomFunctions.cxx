@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "CustomFunctions.h"
 
-// defining vectors outside the scope of the functions
+//defining vectors outside the scope of the functions
 std::vector<float> x_array;
 std::vector<float> y_array;
 std::vector<float> magnitude_array;
@@ -28,7 +28,8 @@ int amount=1;
 
 READING function
 
-This function takes as 
+This function takes as the name of a file as argument, reads every every line and write the value of 
+x and y into separate vectors. 
 
 */
 //////////////////////////
@@ -68,8 +69,17 @@ int reading(std::string fileName){
     return 0;
 }
 
+////////////////////// 
+/*
 
-//reading function - FOR ERRORS
+READING function - for errors
+
+This function also reads a file and puts the error values of the x and y coordinate into separate vectors. 
+Ideally, only one reading function should be used, but I spent a lot of time trying to combine them
+and kept having issues with the scope of vectors.
+
+*/ 
+//////////////////////
 
 int reading_error(std::string fileName2){
 
@@ -109,13 +119,23 @@ int reading_error(std::string fileName2){
     return 0;
 }
 
+//////////////////////
+/* 
 
-//printing function 
+PRINTING function
+
+This function should be used after a reading dunction. It reads the vectors containing the x and y 
+coordinates, calculates the magnitude of the vector from the origin to that data point, and 
+prints to the terminal the magnitude for the number of data points given as argument. 
+
+*/
+//////////////////////
 
 int printing(int lineNumber) {
     double x;
     double y;
 
+    //return error message if the number of line is too high, and taking the max number of lines
     if (lineNumber>x_array.size()){
         std::cout << "It exceeds the maximum number of lines, which is " << x_array.size() <<std::endl;
         lineNumber = x_array.size();}
@@ -134,22 +154,40 @@ int printing(int lineNumber) {
     return 0;
 }
 
+////////////////////
+/*
 
-//magnitude function
+MAGNITUDE function
+
+This function calculates the magnitude of the vector from the origin to the data point and 
+adds this value to a vector. 
+
+*/
+////////////////////
 
 std::vector<float> magnitudeFct(){
+    
+    //calculating the magnitude and adding the outcome to an array
     for(int i=0; i<sizeof(x_array); i++){
-
-        //calculating the magnitude and adding the outcome to an array
         float magnitude = sqrt(pow(x_array[i],2) + pow(y_array[i],2));
-        magnitude_array.push_back(magnitude);
-    }
+        magnitude_array.push_back(magnitude);}
+
     std::cout << "The values of the magnitudes have been added to the vector." << std::endl; //check-point
     return magnitude_array;
 }
 
+////////////////////////
+/*
 
-// calculating the straight line function
+STRAIGHT LINE function
+
+This function derives the equation of the straight line that fits the data the best. It uses the
+least squares method to determine the value of the gradient and intercept of the best fit. It also
+calculates the value of the chi square in order to evaluate the goodness of the fit. This function
+returns a string which contains the equation of the best fit and the value of chi square. 
+
+*/
+////////////////////////
 
 std::string straightLine(){
     
@@ -192,14 +230,24 @@ std::string straightLine(){
     return lineString;
 }
 
+/////////////////////
+/*
 
-// recursive function to calculate x^y
+POWER function
+
+This function calculates the value of x^y. It is an alternative to the pow() function and does not 
+use any loop. !! Be careful: this function is recursive. !!
+
+*/
+/////////////////////
 
 float power(float x, float y, float r) {
- 
+
+    //rounding y to the above integer
     int y_int = (int)y+1;
     float result;
     
+    //repeating the function for y times 
     if (amount==y_int){
         return r;}
     else if (amount<y_int){
@@ -208,10 +256,18 @@ float power(float x, float y, float r) {
         std::cout << "Error??" << std::endl;
         return 1;}
     return power(x,y,x*r);
-
 }
 
-// function which calculates x^y for the whole dataset
+//////////////////////
+/*
+
+POWER function - for the whole dataset
+
+This function uses the above general power function, but applies it to the whole dataset and 
+adds the values to another vector.
+
+*/
+//////////////////////
 
 std::vector<float> power_dataset(){
 
@@ -229,10 +285,23 @@ std::vector<float> power_dataset(){
     return x_power_array;
 }
 
+////////////////////////
+/*
+
+OUTPUT FILE function 
+
+This function adds the output of another function into a new file. It takes a string as argument and 
+can be used for 3 different functions (power_dataset(), magnitudeFct() and straightLine()). In order
+to use this function with a different function, another if statement needs to be added. 
+
+*/
+////////////////////////
+
 int output_file(std::string fct){
 
+    //power function
     if (fct=="power_dataset"){
-
+        
         std::string fileName = "FilePower.txt";
         std::ofstream outputFile(fileName);
         outputFile << "For each data point, the value of x^y is" << '\n';
@@ -243,10 +312,10 @@ int output_file(std::string fct){
             outputFile << element << '\n';}
 
         outputFile.close();
-
         std::cout << "The output has been added to the following file: " << fileName << std::endl;
     }
 
+    //magnitude function
     else if (fct=="magnitude"){
 
         std::string fileName = "FileMagnitude.txt";
@@ -259,18 +328,16 @@ int output_file(std::string fct){
             outputFile << element << '\n';}
 
         outputFile.close();
-
         std::cout << "The output has been added to the following file: " << fileName << std::endl;}
     
+    //straight line function
     else if (fct=="line"){
 
         std::string fileName = "FileLine.txt";
         std::ofstream outputFile(fileName);
         std::string result = straightLine();
-            
         outputFile << result;
         outputFile.close();
-
         std::cout << "The output has been added to the following file: " << fileName << std::endl;}
 
     return 0;

@@ -2,11 +2,13 @@
 // 15 Nov 2023
 // SUPA C++ course - Lab 1
 
-/* Update: I've started writing the straightLine function in the 
-CustomFunction.cxx file. It's not properly adding all the values though... 
+/* 
 
-Note that the *backup* version of this script is just what I had before 
-splitting the 2 functions => keep as backup
+This is the first assignement of the SUPA C++ course, taken in 2023. 
+This steering file needs to be ran with the CustomFunction.cxx and CustomFunction.h external 
+files, which contain the necessary functions. This script interacts with the user via the terminal
+and uses two data sets (input2D_float.txt and error2D_float.txt) to execute 3 tasks (calculating 
+the magnitude of a vector, derivating the equation of a best fit line and calculating the value of x^y).
 
 */
 
@@ -18,13 +20,14 @@ splitting the 2 functions => keep as backup
 
 int main(){
     
-    // read the data
+    //reading the data
     std::string fileName = "input2D_float.txt";
     reading(fileName);
 
     int i;
     bool go=true;
 
+    //using a SWITCH to know which function to execute
     while(go){
         std::cout << "Please enter a integer between 1 and 3." << std::endl;
         std::cout << "1 = Calculating the magnitude of the vector to the point." << std::endl;
@@ -34,32 +37,34 @@ int main(){
         std::cin >> i;
         
         switch (i){
+
+            //execute the magnitude function
             case 1:{
                 std::cout << "You have chosen option 1 (Calculating the magnitude of the vector to the point)." << std::endl;
                 
-                // use the terminal input to define whether to print or calculate the magnitude
+                //use the terminal input to define whether to print or calculate the magnitude
                 std::string answer;
                 std::cout << "Would you like to use the printing or calculating function? Answer with 'P' or 'C'." << std::endl;
                 std::cin >> answer;
                 
-                // printing option
+                //printing option
                 if (answer=="P"){
                     int lineNumber;
                     std::string answer2;
                     std::cout << "How many lines would you like to print?" << std::endl;
                     std::cin >> answer2;
                     lineNumber = std::stoi(answer2);
-                    printing(lineNumber);
-                    }
-                // computing without printing option
+                    printing(lineNumber);}
+
+                //computing without printing option
                 else if (answer=="C"){} //magnitudeFct();}
                 else {std::cout << "Please type your answer in the format P or C.";}
 
-                // writing the output to a new file
+                //writing the output to a new file
                 output_file("magnitude");
-
                 break;}
             
+            //execute the straight line function
             case 2:{
                 std::cout << "You have chosen option 2 (Fitting a straight line to the data and calculating chi square)." << std::endl;
                 
@@ -69,16 +74,15 @@ int main(){
 
                 // computing the equation and writing the output to a new file
                 output_file("line");
-                
                 break;}
 
+            //execute the power function
             case 3:{
                 std::cout << "You have chosen option 3 (Computing the value of x^y)." << std::endl;
                 std::cout << "The values of x^y have been calculated for all the datapoints." << std::endl;
                 
                 // writing the output to a new file
                 output_file("power_dataset");
-                
                 break;}
 
             // breaking the loop
@@ -90,10 +94,8 @@ int main(){
                 std::cout << "You didn't choose a valid option." << std::endl;
                 std::cout << "Exit loop." << std::endl;
                 go=false;
-                break;
-            }
+                break;}
         }    
     }
-
     return 0;
 }

@@ -1,4 +1,4 @@
-// Separate File containing the functions fro Analysedata.cxx
+// Separate file containing the function prototypes from Analysedata.cxx
 
 #pragma once
 
