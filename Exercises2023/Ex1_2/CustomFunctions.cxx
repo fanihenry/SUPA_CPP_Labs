@@ -23,7 +23,15 @@ std::vector<float> x2_array;
 std::vector<float> x_power_array;
 int amount=1;
 
-//reading function 
+//////////////////////////
+/*
+
+READING function
+
+This function takes as 
+
+*/
+//////////////////////////
 
 int reading(std::string fileName){
 
@@ -129,7 +137,7 @@ int printing(int lineNumber) {
 
 //magnitude function
 
-int magnitudeFct(){
+std::vector<float> magnitudeFct(){
     for(int i=0; i<sizeof(x_array); i++){
 
         //calculating the magnitude and adding the outcome to an array
@@ -137,13 +145,13 @@ int magnitudeFct(){
         magnitude_array.push_back(magnitude);
     }
     std::cout << "The values of the magnitudes have been added to the vector." << std::endl; //check-point
-    return 0;
+    return magnitude_array;
 }
 
 
 // calculating the straight line function
 
-int straightLine(){
+std::string straightLine(){
     
     //define variables
     float chi, chi_square, gradient_value, intercept_value;  
@@ -174,18 +182,14 @@ int straightLine(){
         chi_array.push_back(chi);}
     chi_square = accumulate(chi_array.begin(),chi_array.end(),0.0f); 
 
-    //final equation and chi square - print and copy to new file
-    std::string equation = std::to_string(gradient_value) + " * x + " + std::to_string(intercept_value);
+    // print and save the output into a string
+    std::string equation = "The fitting function has equation " + std::to_string(gradient_value) + " * x + " + std::to_string(intercept_value);
     std::string goodness = "The value of chi square is " + std::to_string(chi_square);
-    std::cout << "The fitting function has equation " << equation << std::endl;
+    std::cout << equation << std::endl;
     std::cout << goodness << std::endl;
-    std::string fileName = "NewFile.txt";
-    std::ofstream outputFile(fileName);
-    outputFile << equation;
-    outputFile << goodness;
-    outputFile.close();
+    std::string lineString = equation + "\n" + goodness;
 
-    return 0;
+    return lineString;
 }
 
 
@@ -197,7 +201,6 @@ float power(float x, float y, float r) {
     float result;
     
     if (amount==y_int){
-        std::cout << "The result of x=" << x << " raised to the power of y=" << y << " is " << r << std::endl;
         return r;}
     else if (amount<y_int){
         amount++ ;}
@@ -208,20 +211,67 @@ float power(float x, float y, float r) {
 
 }
 
-int power_dataset(){
+// function which calculates x^y for the whole dataset
+
+std::vector<float> power_dataset(){
 
     //looping over all values in the dataset
     for(int i=0; i<x_array.size(); i++){
         float x_power;
+
+        //resetting iterations
+        amount=1;
+
         // calculating x^y
         x_power = power(x_array[i],y_array[i],x_array[i]);
-        x_power_array.push_back(x_power);
-        // calculating the component equal to x square
-        float x2 = pow(x_array[i],2);
-        x2_array.push_back(x2);}
-        
-    // summing over 
-    float xy_sum = accumulate(xy_array.begin(),xy_array.end(),0.0f);
+        x_power_array.push_back(x_power);}
+
+    return x_power_array;
+}
+
+int output_file(std::string fct){
+
+    if (fct=="power_dataset"){
+
+        std::string fileName = "FilePower.txt";
+        std::ofstream outputFile(fileName);
+        outputFile << "For each data point, the value of x^y is" << '\n';
+        std::vector<float> result = power_dataset();
+
+        for (int i=0; i<result.size(); i++){
+            float element = result[i];
+            outputFile << element << '\n';}
+
+        outputFile.close();
+
+        std::cout << "The output has been added to the following file: " << fileName << std::endl;
+    }
+
+    else if (fct=="magnitude"){
+
+        std::string fileName = "FileMagnitude.txt";
+        std::ofstream outputFile(fileName);
+        outputFile << "For each data point, the magnitude of the vector is:" << '\n';
+        std::vector<float> result = magnitudeFct();
+
+        for (int i=0; i<result.size(); i++){
+            float element = result[i];
+            outputFile << element << '\n';}
+
+        outputFile.close();
+
+        std::cout << "The output has been added to the following file: " << fileName << std::endl;}
+    
+    else if (fct=="line"){
+
+        std::string fileName = "FileLine.txt";
+        std::ofstream outputFile(fileName);
+        std::string result = straightLine();
+            
+        outputFile << result;
+        outputFile.close();
+
+        std::cout << "The output has been added to the following file: " << fileName << std::endl;}
 
     return 0;
 }

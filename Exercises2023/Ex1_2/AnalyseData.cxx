@@ -7,6 +7,7 @@ CustomFunction.cxx file. It's not properly adding all the values though...
 
 Note that the *backup* version of this script is just what I had before 
 splitting the 2 functions => keep as backup
+
 */
 
 #include <iostream>
@@ -21,37 +22,78 @@ int main(){
     std::string fileName = "input2D_float.txt";
     reading(fileName);
 
-    // use the terminal input to define whether to print or calculate the magnitude
-    std::string answer;
-    std::cout << "Would you like to use the printing or calculating function? Answer with 'P' or 'C'." << std::endl;
-    std::cin >> answer;
+    int i;
+    bool go=true;
 
-    if (answer=="P"){
-        int lineNumber;
-        std::string answer2;
-        std::cout << "How many lines would you like to print?" << std::endl;
-        std::cin >> answer2;
-        lineNumber = std::stoi(answer2);
-        printing(lineNumber);
-        }
-    else if (answer=="C"){magnitudeFct();}
-    else {std::cout << "Please type your answer in the format P or C.";}
-    
-    // reading the error files 
-    std::string fileName2 = "error2D_float.txt";
-    reading_error(fileName2);
+    while(go){
+        std::cout << "Please enter a integer between 1 and 3." << std::endl;
+        std::cout << "1 = Calculating the magnitude of the vector to the point." << std::endl;
+        std::cout << "2 = Fitting a straight line to the data and calculating chi square." << std::endl;
+        std::cout << "3 = Computing the value of x^y." << std::endl;
+        std::cout << "0 = Exiting loop." << std::endl;
+        std::cin >> i;
+        
+        switch (i){
+            case 1:{
+                std::cout << "You have chosen option 1 (Calculating the magnitude of the vector to the point)." << std::endl;
+                
+                // use the terminal input to define whether to print or calculate the magnitude
+                std::string answer;
+                std::cout << "Would you like to use the printing or calculating function? Answer with 'P' or 'C'." << std::endl;
+                std::cin >> answer;
+                
+                // printing option
+                if (answer=="P"){
+                    int lineNumber;
+                    std::string answer2;
+                    std::cout << "How many lines would you like to print?" << std::endl;
+                    std::cin >> answer2;
+                    lineNumber = std::stoi(answer2);
+                    printing(lineNumber);
+                    }
+                // computing without printing option
+                else if (answer=="C"){} //magnitudeFct();}
+                else {std::cout << "Please type your answer in the format P or C.";}
 
-    // computing the best fit equation
-    straightLine();
+                // writing the output to a new file
+                output_file("magnitude");
 
-    // computing the power function x^y
-    float x = 2.2;
-    float y = 0.0;
-    float result = power(x, y, x);
+                break;}
+            
+            case 2:{
+                std::cout << "You have chosen option 2 (Fitting a straight line to the data and calculating chi square)." << std::endl;
+                
+                // reading the error files 
+                std::string fileName2 = "error2D_float.txt";
+                reading_error(fileName2);
 
-    // computing x^y for all the datapoints
-    power_dataset();
-    std::cout << "The values of x^y have been calculated for all the datapoints." << std::endl;
+                // computing the equation and writing the output to a new file
+                output_file("line");
+                
+                break;}
+
+            case 3:{
+                std::cout << "You have chosen option 3 (Computing the value of x^y)." << std::endl;
+                std::cout << "The values of x^y have been calculated for all the datapoints." << std::endl;
+                
+                // writing the output to a new file
+                output_file("power_dataset");
+                
+                break;}
+
+            // breaking the loop
+            case 0:{
+                std::cout << "You have chosen option 0 (Exit loop)." << std::endl;
+                go=false;
+                break;}
+            default:{
+                std::cout << "You didn't choose a valid option." << std::endl;
+                std::cout << "Exit loop." << std::endl;
+                go=false;
+                break;
+            }
+        }    
+    }
 
     return 0;
 }
