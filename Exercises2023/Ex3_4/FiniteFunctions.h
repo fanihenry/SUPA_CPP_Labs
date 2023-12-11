@@ -18,6 +18,8 @@ public:
   void setRangeMax(double RMax);
   void setOutfile(std::string outfile);
   void plotFunction(); //Plot the function using scanFunction
+  double x_mean(std::vector<double> dataset);
+  double standard_deviation(std::vector<double> dataset);
   
   //Plot the supplied data points (either provided data or points sampled from function) as a histogram using NBins
   void plotData(std::vector<double> &points, int NBins, bool isdata=true); //NB! use isdata flag to pick between data and sampled distributions
@@ -52,12 +54,16 @@ private:
 
 class NormalDis : public FiniteFunction {
   private:
-  double normal_fct(double x, double u, double o); 
+  double normal_fct(double x); 
+  double callFunction(double x);
+  double integrate(int Ndiv);
 };
 
 class ChauchyLorentzDis : public FiniteFunction {
   private:
-  double cauchy_lorentz_fct(double x, double gamma, double x0); 
+  double cauchy_lorentz_fct(double x); 
+  double callFunction(double x);
+  double integrate(int Ndiv);
 };
 
 class CrystalBallDis : public FiniteFunction {

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <numeric>
+#include <algorithm>
 #include "FiniteFunctions.h"
 #include <filesystem> //To check extensions in a nice way
 #include "gnuplot-iostream.h" //Needed to produce plots (not part of the course) 
@@ -56,7 +58,7 @@ double FiniteFunction::rangeMax() {return m_RMax;};
 ###################
 */ 
 double FiniteFunction::invxsquared(double x) {return 1/(1+x*x);};
-double FiniteFunction::callFunction(double x) {return this->invxsquared(x);}; //(overridable)
+double FiniteFunction::callFunction(double x) {return this->invxsquared(x);} //(overridable)
 
 /*
 ###################
@@ -95,6 +97,32 @@ double FiniteFunction::integral(int Ndiv) { //public
     return m_Integral;
   }
   else return m_Integral; //Don't bother re-calculating integral if Ndiv is the same as the last call
+}
+
+/*
+###################
+// Derivation of the parameters for the distributions
+###################
+*/
+
+// Mean
+
+double FiniteFunction::x_mean(std::vector<double> dataset){
+  double result = (accumulate(dataset.begin(),dataset.end(),0.0f))/dataset.size();
+  return result;
+}
+
+// Standard deviation (o)
+
+double FiniteFunction::standard_deviation(std::vector<double> dataset){
+  std::vector<double> std_dev_array;
+  double x_mean = this->x_mean(dataset);
+  for(int i=0; i<sizeof(dataset); i++){
+        double std_dev = pow(dataset[i]-x_mean,2);
+        std_dev_array.push_back(std_dev);}
+  double sum = accumulate(std_dev_array.begin(),std_dev_array.end(),0.0f);
+  double result = std::sqrt(sum/sizeof(dataset));
+  return result;
 }
 
 /*
@@ -258,18 +286,78 @@ void FiniteFunction::generatePlot(Gnuplot &gp){
 
 // New functions I have added
 
-double normal_fct(double x, double u, double o){
+// Normal distribution
+
+double NormalDis::normal_fct(double x){
+    
+    double u=x_mean(dataset);
+    double o=standard_deviation(dataset);
+    
     double step1 = 1/(o*std::sqrt(2*M_PI));
     double step2 = pow((x-u)/o,2);
-    double result = step1 * exp(-1/2 * step2);
+    double result = step1 * exp(-step2*2);
     return result;
 }
 
-double cauchy_lorentz_fct(double x, double gamma, double x0){
+double NormalDis::callFunction(double x){return this->normal_fct(x);} //(overridable)
+
+double NormalDis::integrate(int Ndiv){ //private
+  //ToDo write an integrator
+  //Integrating using Simpson's rule
+
+  double a = -5.0;
+  double b = 5.0;
+  
+  if (Ndiv % 2 != 0) {
+      std::cerr << "Number of intervals must be even for Simpson's rule." << std::endl;
+      return -99;}
+
+  double h = (b - a) / Ndiv;
+  double result = normal_fct(a) + normal_fct(b);
+
+  for (int i = 1; i < Ndiv; i += 2) {
+      result += 4 * normal_fct(a + i * h);}
+  for (int i = 2; i < Ndiv - 1; i += 2) {
+      result += 2 * normal_fct(a + i * h);}
+  return h / 3.0 * result;  
+}
+
+// Cauchy-Lorentz distribution
+
+double ChauchyLorentzDis::cauchy_lorentz_fct(double x){
+    
+    double gamma=0.2;
+    double x0=1;
+
     double step1 = pow((x-x0)/gamma,2);
     double result = 1 / (M_PI * gamma *(1+step1));
     return result;
 }
+
+double ChauchyLorentzDis::callFunction(double x){return this->cauchy_lorentz_fct(x);} //(overridable)
+
+double ChauchyLorentzDis::integrate(int Ndiv){ //private
+  //ToDo write an integrator
+  //Integrating using Simpson's rule
+
+  double a = -5.0;
+  double b = 5.0;
+  
+  if (Ndiv % 2 != 0) {
+      std::cerr << "Number of intervals must be even for Simpson's rule." << std::endl;
+      return -99;}
+
+  double h = (b - a) / Ndiv;
+  double result = cauchy_lorentz_fct(a) + cauchy_lorentz_fct(b);
+
+  for (int i = 1; i < Ndiv; i += 2) {
+      result += 4 * cauchy_lorentz_fct(a + i * h);}
+  for (int i = 2; i < Ndiv - 1; i += 2) {
+      result += 2 * cauchy_lorentz_fct(a + i * h);}
+  return h / 3.0 * result;  
+}
+
+// Crystal Ball distribution
 
 double crystal_ball_fct(double x, double alpha, double n, double o){
     double x_mean = 1;
