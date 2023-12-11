@@ -3,8 +3,10 @@
 #include <vector>
 #include "FiniteFunctions.h"
 #include <filesystem> //To check extensions in a nice way
-
 #include "gnuplot-iostream.h" //Needed to produce plots (not part of the course) 
+
+// define what x_mean is in Crystal ball 
+// find out what the o,n,etc values are meants to be 
 
 using std::filesystem::path;
 
@@ -63,8 +65,25 @@ Integration by hand (output needed to normalise function when plotting)
 */ 
 double FiniteFunction::integrate(int Ndiv){ //private
   //ToDo write an integrator
-  return -99;  
+  //Integrating using Simpson's rule
+
+  double a = -5.0;
+  double b = 5.0;
+  
+  if (Ndiv % 2 != 0) {
+      std::cerr << "Number of intervals must be even for Simpson's rule." << std::endl;
+      return -99;}
+
+  double h = (b - a) / Ndiv;
+  double result = invxsquared(a) + invxsquared(b);
+
+  for (int i = 1; i < Ndiv; i += 2) {
+      result += 4 * invxsquared(a + i * h);}
+  for (int i = 2; i < Ndiv - 1; i += 2) {
+      result += 2 * invxsquared(a + i * h);}
+  return h / 3.0 * result;  
 }
+
 double FiniteFunction::integral(int Ndiv) { //public
   if (Ndiv <= 0){
     std::cout << "Invalid number of divisions for integral, setting Ndiv to 1000" <<std::endl;
@@ -234,4 +253,37 @@ void FiniteFunction::generatePlot(Gnuplot &gp){
     gp << "plot '-' with points ps 2 lc rgb 'blue' title 'sampled data'\n";
     gp.send1d(m_samples);
   }
+}
+
+
+// New functions I have added
+
+double normal_fct(double x, double u, double o){
+    double step1 = 1/(o*std::sqrt(2*M_PI));
+    double step2 = pow((x-u)/o,2);
+    double result = step1 * exp(-1/2 * step2);
+    return result;
+}
+
+double cauchy_lorentz_fct(double x, double gamma, double x0){
+    double step1 = pow((x-x0)/gamma,2);
+    double result = 1 / (M_PI * gamma *(1+step1));
+    return result;
+}
+
+double crystal_ball_fct(double x, double alpha, double n, double o){
+    double x_mean = 1;
+    double A = pow(n/abs(alpha),n) * exp(-pow(abs(alpha),2)/2);
+    double B = (n/abs(alpha)) - abs(alpha);
+    double C = (n/abs(alpha))*(1/(n-1))*(exp(-pow(abs(alpha),2))/2);
+    double D = std::sqrt(M_PI/2)*(1+erf(abs(alpha)/std::sqrt(2)));
+    double N = 1/(o*(C+D));
+    double condition = (x-x_mean)/o;
+    double result;
+
+    if (condition>-alpha){
+      result = N*exp(-pow(x-x_mean,2)/2*pow(o,2));}
+    else if (condition<=-alpha){
+      result = N*A*pow(B-(x-x_mean)/o,-n);}
+    return result;
 }

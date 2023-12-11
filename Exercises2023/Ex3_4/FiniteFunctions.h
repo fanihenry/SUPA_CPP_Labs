@@ -47,3 +47,20 @@ protected:
 private:
   double invxsquared(double x); //The default functional form
 };
+
+// New classes containing other functions I have added
+
+class NormalDis : public FiniteFunction {
+  private:
+  double normal_fct(double x, double u, double o); 
+};
+
+class ChauchyLorentzDis : public FiniteFunction {
+  private:
+  double cauchy_lorentz_fct(double x, double gamma, double x0); 
+};
+
+class CrystalBallDis : public FiniteFunction {
+  private:
+  double crystal_ball_fct(double x, double alpha, double n, double o); 
+};
