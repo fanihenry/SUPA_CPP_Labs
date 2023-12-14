@@ -14,7 +14,6 @@ Once that's done, repeat for the next 2 distributions.
 #include <iostream>
 #include <cmath>
 #include "FiniteFunctions.h"
-#include "CustomFunctions.h"
 
 // test function 
 
@@ -35,18 +34,37 @@ int main(){
     //fct1.plotFunction();
 
     // Normal distribution - plotting
-    NormalDis fct2;
-    double M=fct2.x_mean(dataset);
-    std::cout << "the mean is " << M << std::endl;
-    double SD=fct2.standard_deviation(dataset);
-    std::cout << "the standard deviation is " << SD << std::endl;
-    fct2.plotData(dataset,binNumber,true);
-    fct2.plotFunction();
+    //std::cout << "Plotting the Normal distribution" << std::endl;
+    //NormalDis fct2;
+    //double m_Integral=NULL;
+    //double M=fct2.x_mean();
+    //double SD=fct2.standard_deviation();
+    //std::cout << "the mean is " << M << std::endl;
+    //std::cout << "the standard deviation is " << SD << std::endl;
+    //fct2.plotData(dataset,binNumber,true);
+    //fct2.plotFunction();
 
     // Cauchy-Lorentz distribution - plotting
+    //std::cout << "Plotting the Cauchy-Lorentz distribution" << std::endl;
     //ChauchyLorentzDis fct3;
+    //double m_Integral=NULL;
+    //double M=fct3.x_mean();
+    //double SD=fct3.standard_deviation();
+    //std::cout << "the mean is " << M << std::endl;
+    //std::cout << "the standard deviation is " << SD << std::endl;
     //fct3.plotData(dataset,binNumber,true);
     //fct3.plotFunction();
+
+    // Crystal Ball distribution - plotting
+    std::cout << "Plotting the Crytal Ball distribution" << std::endl;
+    ChauchyLorentzDis fct4;
+    double m_Integral=NULL;
+    double M=fct4.x_mean();
+    double SD=fct4.standard_deviation();
+    std::cout << "the mean is " << M << std::endl;
+    std::cout << "the standard deviation is " << SD << std::endl;
+    fct4.plotData(dataset,binNumber,true);
+    fct4.plotFunction();
 
     return 0;
 }

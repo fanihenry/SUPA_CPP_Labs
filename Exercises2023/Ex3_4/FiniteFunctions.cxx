@@ -12,6 +12,9 @@
 
 using std::filesystem::path;
 
+//defining vectors outside the scope of the functions
+std::vector<double> dataset;
+
 //Empty constructor
 FiniteFunction::FiniteFunction(){
   m_RMin = -5.0;
@@ -65,9 +68,12 @@ double FiniteFunction::callFunction(double x) {return this->invxsquared(x);} //(
 Integration by hand (output needed to normalise function when plotting)
 ###################
 */ 
+
 double FiniteFunction::integrate(int Ndiv){ //private
   //ToDo write an integrator
   //Integrating using Simpson's rule
+
+  std::cout << "Integrating with integrate - first version" << std::endl;
 
   double a = -5.0;
   double b = 5.0;
@@ -87,6 +93,7 @@ double FiniteFunction::integrate(int Ndiv){ //private
 }
 
 double FiniteFunction::integral(int Ndiv) { //public
+  std::cout << "Integral starting now" << std::endl;
   if (Ndiv <= 0){
     std::cout << "Invalid number of divisions for integral, setting Ndiv to 1000" <<std::endl;
     Ndiv = 1000;
@@ -107,16 +114,20 @@ double FiniteFunction::integral(int Ndiv) { //public
 
 // Mean
 
-double FiniteFunction::x_mean(std::vector<double> dataset){
+double FiniteFunction::x_mean(){
+  //std::vector<double> dataset;
+  //dataset = reading("Outputs/data/MysteryData21122.txt");
   double result = (accumulate(dataset.begin(),dataset.end(),0.0f))/dataset.size();
   return result;
 }
 
 // Standard deviation (o)
 
-double FiniteFunction::standard_deviation(std::vector<double> dataset){
+double FiniteFunction::standard_deviation(){
+  //std::vector<double> dataset;
+  //dataset = reading("Outputs/data/MysteryData21122.txt");
   std::vector<double> std_dev_array;
-  double x_mean = this->x_mean(dataset);
+  double x_mean = this->x_mean();
   for(int i=0; i<sizeof(dataset); i++){
         double std_dev = pow(dataset[i]-x_mean,2);
         std_dev_array.push_back(std_dev);}
@@ -290,12 +301,12 @@ void FiniteFunction::generatePlot(Gnuplot &gp){
 
 double NormalDis::normal_fct(double x){
     
-    double u=x_mean(dataset);
-    double o=standard_deviation(dataset);
+    double u=x_mean();
+    double o=standard_deviation();
     
     double step1 = 1/(o*std::sqrt(2*M_PI));
     double step2 = pow((x-u)/o,2);
-    double result = step1 * exp(-step2*2);
+    double result = step1 * exp(-step2/2);
     return result;
 }
 
@@ -304,6 +315,8 @@ double NormalDis::callFunction(double x){return this->normal_fct(x);} //(overrid
 double NormalDis::integrate(int Ndiv){ //private
   //ToDo write an integrator
   //Integrating using Simpson's rule
+
+  std::cout << "NormalDis::integrate being called here - version 2" << std::endl;
 
   double a = -5.0;
   double b = 5.0;
@@ -319,15 +332,15 @@ double NormalDis::integrate(int Ndiv){ //private
       result += 4 * normal_fct(a + i * h);}
   for (int i = 2; i < Ndiv - 1; i += 2) {
       result += 2 * normal_fct(a + i * h);}
-  return h / 3.0 * result;  
+  return h / 3.0 * result; 
 }
 
 // Cauchy-Lorentz distribution
 
 double ChauchyLorentzDis::cauchy_lorentz_fct(double x){
     
-    double gamma=0.2;
-    double x0=1;
+    double gamma=1.4; //scalling factor, I evaluated the value with test and error
+    double x0=-1; //position of the peak - I evaluated it graphically
 
     double step1 = pow((x-x0)/gamma,2);
     double result = 1 / (M_PI * gamma *(1+step1));
@@ -339,6 +352,8 @@ double ChauchyLorentzDis::callFunction(double x){return this->cauchy_lorentz_fct
 double ChauchyLorentzDis::integrate(int Ndiv){ //private
   //ToDo write an integrator
   //Integrating using Simpson's rule
+
+  std::cout << "ChauchyLorentzDis::integrate being called here - version 3" << std::endl;
 
   double a = -5.0;
   double b = 5.0;
@@ -359,8 +374,14 @@ double ChauchyLorentzDis::integrate(int Ndiv){ //private
 
 // Crystal Ball distribution
 
-double crystal_ball_fct(double x, double alpha, double n, double o){
+double CrystalBallDis::crystal_ball_fct(double x){
+    
+    //parameters
     double x_mean = 1;
+    double u=x_mean();
+    double o=standard_deviation();
+
+    //derivations
     double A = pow(n/abs(alpha),n) * exp(-pow(abs(alpha),2)/2);
     double B = (n/abs(alpha)) - abs(alpha);
     double C = (n/abs(alpha))*(1/(n-1))*(exp(-pow(abs(alpha),2))/2);
@@ -374,4 +395,65 @@ double crystal_ball_fct(double x, double alpha, double n, double o){
     else if (condition<=-alpha){
       result = N*A*pow(B-(x-x_mean)/o,-n);}
     return result;
+}
+
+double CrystalBallDis::callFunction(double x){return this->crystal_ball_fct(x);} //(overridable)
+
+double CrystalBallDis::integrate(int Ndiv){ //private
+  //ToDo write an integrator
+  //Integrating using Simpson's rule
+
+  std::cout << "CrystalBallDis::integrate being called here - version 4" << std::endl;
+
+  double a = -5.0;
+  double b = 5.0;
+  
+  if (Ndiv % 2 != 0) {
+      std::cerr << "Number of intervals must be even for Simpson's rule." << std::endl;
+      return -99;}
+
+  double h = (b - a) / Ndiv;
+  double result = crystal_ball_fct(a) + crystal_ball_fct(b);
+
+  for (int i = 1; i < Ndiv; i += 2) {
+      result += 4 * crystal_ball_fct(a + i * h);}
+  for (int i = 2; i < Ndiv - 1; i += 2) {
+      result += 2 * crystal_ball_fct(a + i * h);}
+  return h / 3.0 * result;  
+}
+
+//////////////////////////
+/*
+
+READING function
+
+This function takes as the name of a file as argument, reads every every line and write the value of 
+x and y into separate vectors. 
+
+*/
+//////////////////////////
+
+std::vector<double> reading(std::string fileName){
+
+    // open and read the file
+    std::ifstream inputFile(fileName);
+    if(inputFile.is_open()){ std::cout << "File is open" << std::endl;}
+    else{std::cout << "File is not open" << std::endl;}
+
+    // loop over every line and store the values in a vector
+    std::string line;  
+    int lineNumber = 0;
+    double x;
+
+    while(std::getline(inputFile,line)){
+        std::string x_string = line.substr(0, line.find(","));
+        x = std::stof(x_string);
+        dataset.push_back(x);
+        lineNumber++;}
+
+    //closing the file
+    inputFile.close();
+    std::cout << "File is closed" << std::endl; //check-point
+
+    return dataset;
 }

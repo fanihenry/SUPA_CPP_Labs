@@ -4,6 +4,9 @@
 
 #pragma once //Replacement for IFNDEF
 
+//functions prototypes
+std::vector<double> reading(std::string fileName);
+
 class FiniteFunction{
 
 public:
@@ -18,8 +21,8 @@ public:
   void setRangeMax(double RMax);
   void setOutfile(std::string outfile);
   void plotFunction(); //Plot the function using scanFunction
-  double x_mean(std::vector<double> dataset);
-  double standard_deviation(std::vector<double> dataset);
+  double x_mean();
+  double standard_deviation();
   
   //Plot the supplied data points (either provided data or points sampled from function) as a histogram using NBins
   void plotData(std::vector<double> &points, int NBins, bool isdata=true); //NB! use isdata flag to pick between data and sampled distributions
@@ -30,7 +33,6 @@ public:
 protected:
   double m_RMin;
   double m_RMax;
-  double m_Integral;
   int m_IntDiv = 0; //Number of division for performing integral
   std::string m_FunctionName;
   std::string m_OutData; //Output filename for data
@@ -41,13 +43,15 @@ protected:
   bool m_plotfunction = false; //Flag to determine whether to plot function
   bool m_plotdatapoints = false; //Flag to determine whether to plot input data
   bool m_plotsamplepoints = false; //Flag to determine whether to plot sampled data 
-  double integrate(int Ndiv);
+  //double integrate(int Ndiv);
   std::vector< std::pair<double, double> > makeHist(std::vector<double> &points, int Nbins); //Helper function to turn data points into histogram with Nbins
   void checkPath(std::string outstring); //Helper function to ensure data and png paths are correct
   void generatePlot(Gnuplot &gp); 
   
 private:
+  double m_Integral;
   double invxsquared(double x); //The default functional form
+  virtual double integrate(int Ndiv);
 };
 
 // New classes containing other functions I have added
@@ -68,5 +72,7 @@ class ChauchyLorentzDis : public FiniteFunction {
 
 class CrystalBallDis : public FiniteFunction {
   private:
-  double crystal_ball_fct(double x, double alpha, double n, double o); 
+  double crystal_ball_fct(double x); 
+  double callFunction(double x);
+  double integrate(int Ndiv);
 };
