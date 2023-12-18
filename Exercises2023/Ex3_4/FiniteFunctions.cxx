@@ -3,12 +3,13 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
+#include <random>
 #include "FiniteFunctions.h"
 #include <filesystem> //To check extensions in a nice way
 #include "gnuplot-iostream.h" //Needed to produce plots (not part of the course) 
 
-// define what x_mean is in Crystal ball 
-// find out what the o,n,etc values are meants to be 
+// change the value of f(x) and f(y) in A
+// make it so you can change the function that i used in sampling 
 
 using std::filesystem::path;
 
@@ -377,9 +378,10 @@ double ChauchyLorentzDis::integrate(int Ndiv){ //private
 double CrystalBallDis::crystal_ball_fct(double x){
     
     //parameters
-    double x_mean = 1;
-    double u=x_mean();
+    double mean=x_mean();
     double o=standard_deviation();
+    double n=2;
+    double alpha=1;
 
     //derivations
     double A = pow(n/abs(alpha),n) * exp(-pow(abs(alpha),2)/2);
@@ -387,13 +389,13 @@ double CrystalBallDis::crystal_ball_fct(double x){
     double C = (n/abs(alpha))*(1/(n-1))*(exp(-pow(abs(alpha),2))/2);
     double D = std::sqrt(M_PI/2)*(1+erf(abs(alpha)/std::sqrt(2)));
     double N = 1/(o*(C+D));
-    double condition = (x-x_mean)/o;
+    double condition = (x-mean)/o;
     double result;
 
     if (condition>-alpha){
-      result = N*exp(-pow(x-x_mean,2)/2*pow(o,2));}
+      result = N*exp(-pow(x-mean,2)/2*pow(o,2));}
     else if (condition<=-alpha){
-      result = N*A*pow(B-(x-x_mean)/o,-n);}
+      result = N*A*pow(B-(x-mean)/o,-n);}
     return result;
 }
 
@@ -456,4 +458,54 @@ std::vector<double> reading(std::string fileName){
     std::cout << "File is closed" << std::endl; //check-point
 
     return dataset;
+}
+
+//////////////////////////
+/*
+
+SAMPLING function
+
+*/
+//////////////////////////
+
+int sampling(){
+
+  std::vector<double> array_y;
+
+  //generating random number x
+  std::random_device seed;
+  std::mt19937 gen(seed());
+  std::uniform_real_distribution<double> distribution(-5.0, 5.0);
+  double x = distribution(gen);
+  std::cout << "x is " << x << std::endl;
+
+  //generate random number y from normal distribution with mean=x and standard deviation=3 (arbitrarily chosen)
+  std::random_device seed2;
+  std::mt19937 gen2(seed2());
+  std::normal_distribution<double> distribution2(x, 3.0);
+  double y = distribution2(gen2);
+  std::cout << "y is " << y << std::endl;
+  array_y.push_back(y);
+
+  //calculating A
+  double f_y= 6.0;
+  double f_x = 7.0;
+  double A=std::min(f_y / f_x, 1.0);
+  std::cout << "A is " << A << std::endl;
+  
+  //generating random number T between 0 and 1
+  std::random_device seed3;
+  std::mt19937 gen3(seed3());
+  std::uniform_real_distribution<double> distribution3(0.0, 1.0);
+  double T = distribution3(gen3);
+  std::cout << "T is " << T << std::endl;
+
+  //accetance
+  if (T<A){
+    double accept = y;
+    std::cout << "T<A so we keep y." << std::endl;}
+  else {
+    std::cout << "Else: T>A." << std::endl;}
+
+  return 0;
 }

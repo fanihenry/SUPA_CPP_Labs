@@ -6,6 +6,7 @@
 
 //functions prototypes
 std::vector<double> reading(std::string fileName);
+int sampling();
 
 class FiniteFunction{
 
