@@ -8,9 +8,6 @@
 #include <filesystem> //To check extensions in a nice way
 #include "gnuplot-iostream.h" //Needed to produce plots (not part of the course) 
 
-// change the value of f(x) and f(y) in A
-// make it so you can change the function that i used in sampling 
-
 using std::filesystem::path;
 
 //defining vectors outside the scope of the functions
@@ -74,8 +71,6 @@ double FiniteFunction::integrate(int Ndiv){ //private
   //ToDo write an integrator
   //Integrating using Simpson's rule
 
-  std::cout << "Integrating with integrate - first version" << std::endl;
-
   double a = -5.0;
   double b = 5.0;
   
@@ -97,7 +92,7 @@ double FiniteFunction::integral(int Ndiv) { //public
   std::cout << "Integral starting now" << std::endl;
   if (Ndiv <= 0){
     std::cout << "Invalid number of divisions for integral, setting Ndiv to 1000" <<std::endl;
-    Ndiv = 1000;
+    Ndiv = 100;
   }
   if (m_Integral == NULL || Ndiv != m_IntDiv){
     m_IntDiv = Ndiv;
@@ -114,19 +109,13 @@ double FiniteFunction::integral(int Ndiv) { //public
 */
 
 // Mean
-
 double FiniteFunction::x_mean(){
-  //std::vector<double> dataset;
-  //dataset = reading("Outputs/data/MysteryData21122.txt");
   double result = (accumulate(dataset.begin(),dataset.end(),0.0f))/dataset.size();
   return result;
 }
 
 // Standard deviation (o)
-
 double FiniteFunction::standard_deviation(){
-  //std::vector<double> dataset;
-  //dataset = reading("Outputs/data/MysteryData21122.txt");
   std::vector<double> std_dev_array;
   double x_mean = this->x_mean();
   for(int i=0; i<sizeof(dataset); i++){
@@ -183,6 +172,9 @@ void FiniteFunction::plotData(std::vector<double> &points, int Nbins, bool isdat
   }
 }
 
+
+//double FiniteFunction::operator()(double x) {
+  //return 0.0*x ;}
 
 /*
   #######################################################################################################
@@ -295,11 +287,20 @@ void FiniteFunction::generatePlot(Gnuplot &gp){
   }
 }
 
+/*
+############################################################################
+//New functions I have added
+############################################################################
+*/ 
 
-// New functions I have added
 
-// Normal distribution
+/*
+###################
+//Normal Distribution class
+###################
+*/ 
 
+//Normal distribution
 double NormalDis::normal_fct(double x){
     
     double u=x_mean();
@@ -313,11 +314,11 @@ double NormalDis::normal_fct(double x){
 
 double NormalDis::callFunction(double x){return this->normal_fct(x);} //(overridable)
 
+//double NormalDis::operator()(double x){return this->normal_fct(x);} //(overridable)
+
 double NormalDis::integrate(int Ndiv){ //private
   //ToDo write an integrator
   //Integrating using Simpson's rule
-
-  std::cout << "NormalDis::integrate being called here - version 2" << std::endl;
 
   double a = -5.0;
   double b = 5.0;
@@ -336,8 +337,14 @@ double NormalDis::integrate(int Ndiv){ //private
   return h / 3.0 * result; 
 }
 
-// Cauchy-Lorentz distribution
 
+/*
+###################
+//Cauchy-Lorentz Class
+###################
+*/ 
+
+//Cauchy-Lorentz distribution
 double ChauchyLorentzDis::cauchy_lorentz_fct(double x){
     
     double gamma=1.4; //scalling factor, I evaluated the value with test and error
@@ -353,8 +360,6 @@ double ChauchyLorentzDis::callFunction(double x){return this->cauchy_lorentz_fct
 double ChauchyLorentzDis::integrate(int Ndiv){ //private
   //ToDo write an integrator
   //Integrating using Simpson's rule
-
-  std::cout << "ChauchyLorentzDis::integrate being called here - version 3" << std::endl;
 
   double a = -5.0;
   double b = 5.0;
@@ -373,8 +378,13 @@ double ChauchyLorentzDis::integrate(int Ndiv){ //private
   return h / 3.0 * result;  
 }
 
-// Crystal Ball distribution
+/*
+###################
+//Crystal Ball Class
+###################
+*/ 
 
+// Crystal Ball distribution
 double CrystalBallDis::crystal_ball_fct(double x){
     
     //parameters
@@ -384,16 +394,16 @@ double CrystalBallDis::crystal_ball_fct(double x){
     double alpha=1;
 
     //derivations
-    double A = pow(n/abs(alpha),n) * exp(-pow(abs(alpha),2)/2);
-    double B = (n/abs(alpha)) - abs(alpha);
-    double C = (n/abs(alpha))*(1/(n-1))*(exp(-pow(abs(alpha),2))/2);
-    double D = std::sqrt(M_PI/2)*(1+erf(abs(alpha)/std::sqrt(2)));
+    double A = pow(n/std::abs(alpha),n) * exp(-pow(std::abs(alpha),2)/2);
+    double B = (n/std::abs(alpha)) - std::abs(alpha);
+    double C = (n/std::abs(alpha))*(1/(n-1))*exp(-pow(abs(alpha),2)/2);
+    double D = std::sqrt(M_PI/2)*(1+erf(std::abs(alpha)/std::sqrt(2)));
     double N = 1/(o*(C+D));
     double condition = (x-mean)/o;
     double result;
 
     if (condition>-alpha){
-      result = N*exp(-pow(x-mean,2)/2*pow(o,2));}
+      result = N*exp(-pow(x-mean,2)/(2*pow(o,2)));}
     else if (condition<=-alpha){
       result = N*A*pow(B-(x-mean)/o,-n);}
     return result;
@@ -404,8 +414,6 @@ double CrystalBallDis::callFunction(double x){return this->crystal_ball_fct(x);}
 double CrystalBallDis::integrate(int Ndiv){ //private
   //ToDo write an integrator
   //Integrating using Simpson's rule
-
-  std::cout << "CrystalBallDis::integrate being called here - version 4" << std::endl;
 
   double a = -5.0;
   double b = 5.0;
@@ -424,16 +432,12 @@ double CrystalBallDis::integrate(int Ndiv){ //private
   return h / 3.0 * result;  
 }
 
-//////////////////////////
+
 /*
-
-READING function
-
-This function takes as the name of a file as argument, reads every every line and write the value of 
-x and y into separate vectors. 
-
-*/
-//////////////////////////
+###################
+//Reading function
+###################
+*/ 
 
 std::vector<double> reading(std::string fileName){
 
@@ -460,52 +464,77 @@ std::vector<double> reading(std::string fileName){
     return dataset;
 }
 
-//////////////////////////
 /*
+###################
+//Sampling functions
+###################
+*/ 
 
-SAMPLING function
-
-*/
-//////////////////////////
-
-int sampling(){
-
-  std::vector<double> array_y;
-
-  //generating random number x
+//generating random number x
+double FiniteFunction::sampling_x(){
   std::random_device seed;
   std::mt19937 gen(seed());
-  std::uniform_real_distribution<double> distribution(-5.0, 5.0);
+  std::uniform_real_distribution<double> distribution(-10.0, 10.0);
   double x = distribution(gen);
-  std::cout << "x is " << x << std::endl;
+  //std::cout << "x is " << x << std::endl; //check-point
+  return x;
+}
 
-  //generate random number y from normal distribution with mean=x and standard deviation=3 (arbitrarily chosen)
+//generate random number y (different function for each class)
+double NormalDis::sampling_y(double x){
   std::random_device seed2;
   std::mt19937 gen2(seed2());
-  std::normal_distribution<double> distribution2(x, 3.0);
+  std::normal_distribution<double> distribution2(x, 3.0); //with mean=x and standard deviation=3 (arbitrarily chosen)
   double y = distribution2(gen2);
-  std::cout << "y is " << y << std::endl;
-  array_y.push_back(y);
+  //std::cout << "y is " << y << std::endl; //check-point
+  return y;
+}
+double ChauchyLorentzDis::sampling_y(double x){
+  std::random_device seed2;
+  std::mt19937 gen2(seed2());
+  std::cauchy_distribution<double> distribution2(x, 1.55);
+  double y = distribution2(gen2);
+  //std::cout << "y is " << y << std::endl; //check-point
+  return y;
+}
+double CrystalBallDis::sampling_y(double x){
+  std::random_device seed2;
+  std::mt19937 gen2(seed2());
+  std::normal_distribution<double> distribution2(x, 3.0); //THIS SHOULD BE A CRYSTAL BALL DISTRIBUTION AND NOT A NORMAL DISTRIBUTION
+  double y = distribution2(gen2);
+  //std::cout << "y is " << y << std::endl; //check-point
+  return y;
+}
 
-  //calculating A
-  double f_y= 6.0;
-  double f_x = 7.0;
-  double A=std::min(f_y / f_x, 1.0);
-  std::cout << "A is " << A << std::endl;
-  
-  //generating random number T between 0 and 1
+//generating random number T between 0 and 1
+double FiniteFunction::sampling_T(){
   std::random_device seed3;
   std::mt19937 gen3(seed3());
   std::uniform_real_distribution<double> distribution3(0.0, 1.0);
   double T = distribution3(gen3);
-  std::cout << "T is " << T << std::endl;
+  //std::cout << "T is " << T << std::endl; //check-point
+  return T;
+}
 
-  //accetance
-  if (T<A){
-    double accept = y;
-    std::cout << "T<A so we keep y." << std::endl;}
-  else {
-    std::cout << "Else: T>A." << std::endl;}
-
-  return 0;
+//calculating A (different function for each class)
+double NormalDis::sampling_A(double x, double y){
+  double f_x = this->normal_fct(x);
+  double f_y = this->normal_fct(y);
+  double A = std::min(f_y / f_x, 1.0);
+  //std::cout << "A is " << A << std::endl; //check-point
+  return A;
+}
+double ChauchyLorentzDis::sampling_A(double x, double y){
+  double f_x = this->cauchy_lorentz_fct(x);
+  double f_y = this->cauchy_lorentz_fct(y);
+  double A = std::min(f_y / f_x, 1.0);
+  //std::cout << "A is " << A << std::endl; //check-point
+  return A;
+}
+double CrystalBallDis::sampling_A(double x, double y){
+  double f_x = this->crystal_ball_fct(x);
+  double f_y = this->crystal_ball_fct(y);
+  double A = std::min(f_y / f_x, 1.0);
+  //std::cout << "A is " << A << std::endl; //Check-point
+  return A;
 }

@@ -4,10 +4,10 @@
 
 #pragma once //Replacement for IFNDEF
 
-//functions prototypes
+//general functions prototypes
 std::vector<double> reading(std::string fileName);
-int sampling();
 
+//FiniteFunction 
 class FiniteFunction{
 
 public:
@@ -24,6 +24,8 @@ public:
   void plotFunction(); //Plot the function using scanFunction
   double x_mean();
   double standard_deviation();
+  double sampling_x();
+  double sampling_T();
   
   //Plot the supplied data points (either provided data or points sampled from function) as a histogram using NBins
   void plotData(std::vector<double> &points, int NBins, bool isdata=true); //NB! use isdata flag to pick between data and sampled distributions
@@ -44,7 +46,6 @@ protected:
   bool m_plotfunction = false; //Flag to determine whether to plot function
   bool m_plotdatapoints = false; //Flag to determine whether to plot input data
   bool m_plotsamplepoints = false; //Flag to determine whether to plot sampled data 
-  //double integrate(int Ndiv);
   std::vector< std::pair<double, double> > makeHist(std::vector<double> &points, int Nbins); //Helper function to turn data points into histogram with Nbins
   void checkPath(std::string outstring); //Helper function to ensure data and png paths are correct
   void generatePlot(Gnuplot &gp); 
@@ -62,6 +63,9 @@ class NormalDis : public FiniteFunction {
   double normal_fct(double x); 
   double callFunction(double x);
   double integrate(int Ndiv);
+  public:
+  double sampling_A(double x, double y);
+  double sampling_y(double x);
 };
 
 class ChauchyLorentzDis : public FiniteFunction {
@@ -69,6 +73,9 @@ class ChauchyLorentzDis : public FiniteFunction {
   double cauchy_lorentz_fct(double x); 
   double callFunction(double x);
   double integrate(int Ndiv);
+  public:
+  double sampling_A(double x, double y);
+  double sampling_y(double x);
 };
 
 class CrystalBallDis : public FiniteFunction {
@@ -76,4 +83,7 @@ class CrystalBallDis : public FiniteFunction {
   double crystal_ball_fct(double x); 
   double callFunction(double x);
   double integrate(int Ndiv);
+  public:
+  double sampling_A(double x, double y);
+  double sampling_y(double x);
 };
